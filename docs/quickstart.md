@@ -52,16 +52,21 @@ Copilot will call the `get_url_title` tool on your server and return the real pa
 
 ## Corporate / proxy networks
 
-If your network does SSL inspection, add `NODE_EXTRA_CA_CERTS` to the `env` block in `.vscode/mcp.json`:
+If your network does SSL inspection, Node's built-in `fetch` will fail with `SELF_SIGNED_CERT_IN_CHAIN`.
 
-```json
-"env": {
-  "NODE_EXTRA_CA_CERTS": "C:\\Users\\YourName\\your-ca.crt",
-  "NODE_NO_WARNINGS": "1"
-}
+**Set `NODE_EXTRA_CA_CERTS` once as a Windows user environment variable** — this is the recommended approach. It keeps the path out of `mcp.json` (nothing to commit) and applies to all Node.js processes automatically:
+
+```powershell
+[System.Environment]::SetEnvironmentVariable(
+  "NODE_EXTRA_CA_CERTS",
+  "C:\Users\YourName\your-ca.crt",
+  "User"
+)
 ```
 
-See [configuration.md](configuration.md) for details.
+Restart VS Code after running this. No changes to `mcp.json` needed.
+
+See [configuration.md](configuration.md) for alternative approaches.
 
 ---
 

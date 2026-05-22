@@ -66,25 +66,24 @@ The server waits idle on stdin — this is correct. Press **Ctrl+C** to exit.
 
 `.vscode/mcp.json` already exists in the project. VS Code reads it automatically to know how to launch the server. No `settings.json` changes needed.
 
-If you are on a **corporate / proxy network** with SSL inspection, add your CA certificate path to the `env` block:
+If you are on a **corporate / proxy network** with SSL inspection, Node's built-in `fetch` will fail with a `SELF_SIGNED_CERT_IN_CHAIN` error.
 
-```json
-{
-  "servers": {
-    "url-title": {
-      "type": "stdio",
-      "command": "node",
-      "args": ["${workspaceFolder}/dist/server.js"],
-      "env": {
-        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YourName\\your-ca.crt",
-        "NODE_NO_WARNINGS": "1"
-      }
-    }
-  }
-}
+**Recommended: set `NODE_EXTRA_CA_CERTS` as a Windows user environment variable.** This keeps the path out of `mcp.json` (nothing to commit), applies to all Node.js processes on your machine, and requires no changes to any project file:
+
+```powershell
+# Run once in PowerShell — persists across reboots
+[System.Environment]::SetEnvironmentVariable(
+  "NODE_EXTRA_CA_CERTS",
+  "C:\Users\YourName\your-ca.crt",
+  "User"
+)
 ```
 
-> **Important:** Use the Windows path format (`C:\Users\...`). The Git Bash format (`/c/Users/...`) will not be found by Node.js on Windows.
+Restart VS Code after running this — the MCP server inherits the variable automatically.
+
+> **Windows path format required.** Use `C:\Users\...` — the Git Bash format `/c/Users/...` is not recognised by Node.js on Windows.
+
+If you prefer to make the dependency explicit in `mcp.json` without hardcoding the path, use VS Code's `${env:}` substitution (see [configuration.md](configuration.md)).
 
 ---
 

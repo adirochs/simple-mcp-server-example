@@ -16,7 +16,6 @@ This is the only file VS Code needs to discover and launch the MCP server. It li
       "command": "node",
       "args": ["${workspaceFolder}/dist/server.js"],
       "env": {
-        "NODE_EXTRA_CA_CERTS": "C:\\Users\\YourName\\your-ca.crt",
         "NODE_NO_WARNINGS": "1"
       }
     }
@@ -53,8 +52,40 @@ No build step needed. Slower startup, useful when iterating on `server.ts`.
 
 | Variable | Purpose |
 |----------|---------|
-| `NODE_EXTRA_CA_CERTS` | Path to a CA certificate bundle. Required on networks with SSL inspection (corporate proxies). Must use the **Windows path** format (`C:\Users\...`), not the Git Bash format (`/c/Users/...`). |
+| `NODE_EXTRA_CA_CERTS` | Path to a CA certificate bundle. Required on networks with SSL inspection (corporate proxies). See below for the recommended setup. |
 | `NODE_NO_WARNINGS` | Set to `"1"` to suppress Node.js deprecation warnings in the VS Code output panel. |
+
+### `NODE_EXTRA_CA_CERTS` — enterprise / corporate networks
+
+On Windows enterprise networks, outbound HTTPS traffic is often intercepted by a corporate proxy using a self-signed CA. Node's built-in `fetch` will reject the connection with `SELF_SIGNED_CERT_IN_CHAIN` unless it trusts that CA.
+
+**Recommended: set it once as a Windows user environment variable.**  
+This keeps the path out of `mcp.json` (nothing to commit) and makes it available to every Node.js process on your machine — not just the MCP server.
+
+```powershell
+# Run once in PowerShell — persists across reboots
+[System.Environment]::SetEnvironmentVariable(
+  "NODE_EXTRA_CA_CERTS",
+  "C:\Users\YourName\your-ca.crt",
+  "User"
+)
+```
+
+Restart VS Code after running this. The MCP server will inherit the variable automatically and no changes to `mcp.json` are needed.
+
+**Alternative: reference it explicitly in `mcp.json` without hardcoding the path.**  
+VS Code supports `${env:VAR}` substitution in `mcp.json`. Set a named user environment variable (e.g. `CORP_CA_CERT`) and reference it:
+
+```json
+"env": {
+  "NODE_EXTRA_CA_CERTS": "${env:CORP_CA_CERT}",
+  "NODE_NO_WARNINGS": "1"
+}
+```
+
+This makes the dependency visible to teammates who clone the repo (they see `CORP_CA_CERT` and know what to set) while keeping the actual path out of source control.
+
+> **Windows path format required.** Always use `C:\Users\...` — the Git Bash format `/c/Users/...` is not recognised by Node.js on Windows.
 
 ---
 
