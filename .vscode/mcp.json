@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "url-title": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/dist/server.js"],
+      "env": {
+        "NODE_EXTRA_CA_CERTS": "C:\\Users\\U120460\\mobi-ca-certificates.crt",
+        "NODE_NO_WARNINGS": "1"
+      }
+    }
+  }
+}

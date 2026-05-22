@@ -1,0 +1,29 @@
+{
+  "name": "mcp-url-title-server",
+  "version": "1.0.0",
+  "description": "A minimal MCP server that fetches the <title> of a URL",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node --loader ts-node/esm src/server.ts",
+    "dev": "node --loader ts-node/esm src/server.ts",
+    "serve": "node dist/server.js"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "copilot"
+  ],
+  "author": "adirochs",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^v1.29.0",
+    "cheerio": "^1.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "typescript": "^6.0.3",
+    "ts-node": "^10.9.2"
+  }
+}
